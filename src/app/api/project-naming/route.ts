@@ -17,7 +17,9 @@ const namingSchema = z.object({
 });
 
 export async function POST(req: Request) {
-    const { subject, unit, method, competency } = await req.json();
+    const body = await req.json();
+    console.log("[project-naming] Received request:", body);
+    const { subject, unit, method, competency } = body;
 
     const systemPrompt = `당신은 2022 개정 교육과정 전문가이자 대학 입학사정관 실무 경험이 있는 수행평가 설계 컨설턴트입니다.
 교사가 NEIS(나이스) 학교생활기록부에 입력할 '수행평가 영역명(제목)'을 AI가 추천해 드립니다.
@@ -45,13 +47,18 @@ export async function POST(req: Request) {
 - 평가 방식: ${method}
 - 반영할 핵심 역량: ${competency}`;
 
-    const result = await streamObject({
-        model: openai('gpt-4o'),
-        schema: namingSchema,
-        temperature: 0.7,
-        system: systemPrompt,
-        prompt: userPrompt,
-    });
+    try {
+        const result = await streamObject({
+            model: openai('gpt-4o'),
+            schema: namingSchema,
+            temperature: 0.7,
+            system: systemPrompt,
+            prompt: userPrompt,
+        });
 
-    return result.toTextStreamResponse();
+        return result.toTextStreamResponse();
+    } catch (error) {
+        console.error("[project-naming] Error calling OpenAI:", error);
+        return new Response(JSON.stringify({ error: "Failed to generate AI recommendation" }), { status: 500 });
+    }
 }
