@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { z } from "zod";
@@ -212,7 +212,7 @@ const COMPETENCY_OPTIONS = [
 ];
 
 // ─── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
-export default function ProjectNamingPage() {
+function ProjectNamingContent() {
     const searchParams = useSearchParams();
     const tabParam = searchParams.get("tab") as Tab | null;
 
@@ -551,5 +551,13 @@ export default function ProjectNamingPage() {
                 </AnimatePresence>
             </div>
         </div >
+    );
+}
+
+export default function ProjectNamingPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center">Loading...</div>}>
+            <ProjectNamingContent />
+        </Suspense>
     );
 }

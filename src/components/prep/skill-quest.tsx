@@ -89,6 +89,8 @@ export function Step1ReadingTrainer() {
     const { timeLeft, running, percent, start, reset } = useCountdown(40);
     const sample = SAMPLE_SCRIPTS[idx];
 
+    if (!sample) return null;
+
     const handleNext = () => {
         reset();
         setDone(false);
